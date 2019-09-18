@@ -1,9 +1,11 @@
 package org.apache.rocketmq.proxy.common;
 
 public enum MessageType {
-    ASYNC(1, "异步消息"),
+    ASYNC(1, "async"),
 
-    SYNC(2, "同步消息");
+    SYNC(2, "sync"),
+
+    ONEWAY(3, "oneway");
 
     private Integer type;
 

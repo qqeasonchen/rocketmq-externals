@@ -78,8 +78,10 @@ public class SendMessageProcessor implements HttpRequestProcessor {
             return;
         }
 
-        messageLogger.info("message|client2Proxy|REQ|{}|topic={}|bizSeqNo={}|uniqueId={}",
+        messageLogger.info("message|client2Proxy|{}|clientIp={}|pid={}|topic={}|bizSeqNo={}|uniqueId={}",
             MessageType.get(Integer.valueOf(sendMessageRequestBody.getMessageType())),
+            sendMessageRequestHeader.getIp(),
+            sendMessageRequestHeader.getPid(),
             sendMessageRequestBody.getTopic(),
             sendMessageRequestBody.getBizSeqNo(),
             sendMessageRequestBody.getUniqueId());
@@ -121,13 +123,13 @@ public class SendMessageProcessor implements HttpRequestProcessor {
         }
 
         final SendMessageContext sendMessageContext = new SendMessageContext(rocketMQMsg);
-        long startTime = System.currentTimeMillis();
         final CompleteHandler<HttpCommand> handler = (new CompleteHandler<HttpCommand>() {
             @Override
             public void onResponse(HttpCommand httpCommand) {
                 try {
                     mQProxyHttpServer.sendResponse(ctx, httpCommand.httpResponse());
                 } catch (Exception ex) {
+                    messageLogger.warn("send response fail.", ex);
                 }
             }
         });
@@ -135,14 +137,6 @@ public class SendMessageProcessor implements HttpRequestProcessor {
         if (String.valueOf(MessageType.ASYNC.getType()).equals(sendMessageRequestBody.getMessageType())) {
             asyncMessage(asyncContext, sendMessageContext, sendMessageRequestHeader, sendMessageRequestBody, proxyProducer, sendMessageResponseHeader, handler);
         }
-
-        long endTime = System.currentTimeMillis();
-        messageLogger.info("message|proxy2mq|REQ|{}|send2brokerCost={}ms|topic={}|bizSeqNo={}|uniqueId={}",
-            MessageType.SYNC,
-            endTime - startTime,
-            sendMessageRequestBody.getTopic(),
-            sendMessageRequestBody.getBizSeqNo(),
-            sendMessageRequestBody.getUniqueId());
     }
 
     @Override
@@ -191,8 +185,10 @@ public class SendMessageProcessor implements HttpRequestProcessor {
         }
 
         long endTime = System.currentTimeMillis();
-        messageLogger.info("message|proxy2broker|REQ|{}|cost={}ms|topic={}|bizSeqNo={}|uniqueId={}",
-            MessageType.ASYNC,
+        messageLogger.info("message|proxy2broker|{}|clientIp={}|pid={}|cost={}ms|topic={}|bizSeqNo={}|uniqueId={}",
+            MessageType.get(Integer.valueOf(sendMessageRequestBody.getMessageType())),
+            sendMessageRequestHeader.getIp(),
+            sendMessageRequestHeader.getPid(),
             endTime - startTime,
             sendMessageRequestBody.getTopic(),
             sendMessageRequestBody.getBizSeqNo(),

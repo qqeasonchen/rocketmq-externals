@@ -9,26 +9,13 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class SendMessageBatchRequestBody extends Body {
-
-    public static final String BATCHID = "batchId";
     public static final String CONTENTS = "contents";
-    public static final String SIZE = "size";
+    public static final String TOPIC = "topic";
 
-    private String batchId;
-
+    private String topic;
     private List<BatchMessageEntity> contents;
 
-    private String size;
-
     public SendMessageBatchRequestBody() {
-    }
-
-    public String getBatchId() {
-        return batchId;
-    }
-
-    public void setBatchId(String batchId) {
-        this.batchId = batchId;
     }
 
     public List<BatchMessageEntity> getContents() {
@@ -39,20 +26,19 @@ public class SendMessageBatchRequestBody extends Body {
         this.contents = contents;
     }
 
-    public String getSize() {
-        return size;
+    public String getTopic() {
+        return topic;
     }
 
-    public void setSize(String size) {
-        this.size = size;
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("sendMessageBatchRequestBody={")
-            .append("batchId=").append(batchId).append(",")
-            .append("size=").append(size).append(",")
+            .append("topic=").append(topic).append(",")
             .append("contents=").append(JSON.toJSONString(contents)).append("}");
         return sb.toString();
     }
@@ -78,27 +64,20 @@ public class SendMessageBatchRequestBody extends Body {
     }
 
     public static SendMessageBatchRequestBody buildBody(final Map<String, Object> bodyParam) throws Exception {
-        String batchId = MapUtils.getString(bodyParam,
-            BATCHID);
-        String size = StringUtils.isBlank(MapUtils.getString(bodyParam,
-            SIZE)) ? "1" : MapUtils.getString(bodyParam,
-            SIZE);
-        String contents = MapUtils.getString(bodyParam,
-            CONTENTS, null);
+        String topic = MapUtils.getString(bodyParam, TOPIC, null);
+        String contents = MapUtils.getString(bodyParam, CONTENTS, null);
         SendMessageBatchRequestBody body = new SendMessageBatchRequestBody();
-        body.setBatchId(batchId);
+        body.setTopic(topic);
         if (StringUtils.isNotBlank(contents)) {
             body.setContents(JSONArray.parseArray(contents, SendMessageBatchRequestBody.BatchMessageEntity.class));
         }
-        body.setSize(size);
         return body;
     }
 
     @Override
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put(BATCHID, batchId);
-        map.put(SIZE, size);
+        map.put(TOPIC, topic);
         map.put(CONTENTS, contents);
         return map;
     }

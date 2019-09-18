@@ -62,9 +62,7 @@ public class SendBatchMessageProcessor implements HttpRequestProcessor {
             return;
         }
 
-        if (CollectionUtils.isEmpty(sendMessageBatchRequestBody.getContents())
-            || StringUtils.isBlank(sendMessageBatchRequestBody.getBatchId())
-            || (Integer.valueOf(sendMessageBatchRequestBody.getSize()) != CollectionUtils.size(sendMessageBatchRequestBody.getContents()))) {
+        if (CollectionUtils.isEmpty(sendMessageBatchRequestBody.getContents())) {
             responseProxyCommand = asyncContext.getRequest().createHttpCommandResponse(
                 sendMessageBatchResponseHeader,
                 SendMessageBatchResponseBody.buildBody(ProxyResponseCode.PROXY_PROTOCOL_BODY_ERR.getRetCode(), ProxyResponseCode.PROXY_PROTOCOL_BODY_ERR.getErrMsg()));
@@ -72,13 +70,14 @@ public class SendBatchMessageProcessor implements HttpRequestProcessor {
             return;
         }
 
-        batchMessageLogger.info("batchMessage|client2Proxy|REQ|{}|batchId={}|msgNum={}",
+        batchMessageLogger.info("batchMessage|client2Proxy|{}|clientIp={}|pid={}|msgNum={}",
             MessageType.ASYNC,
-            sendMessageBatchRequestBody.getBatchId(),
-            sendMessageBatchRequestBody.getSize());
+            sendMessageBatchRequestHeader.getIp(),
+            sendMessageBatchRequestHeader.getPid(),
+            sendMessageBatchRequestBody.getContents().size());
 
         if (!mQProxyServer.getProxyConfiguration().proxyServerBatchMsgNumLimiter
-            .tryAcquire(Integer.valueOf(sendMessageBatchRequestBody.getSize()), ProxyConstants.DEFAULT_FASTFAIL_TIMEOUT_IN_MILLISECONDS, TimeUnit.MILLISECONDS)) {
+            .tryAcquire(Integer.valueOf(sendMessageBatchRequestBody.getContents().size()), ProxyConstants.DEFAULT_FASTFAIL_TIMEOUT_IN_MILLISECONDS, TimeUnit.MILLISECONDS)) {
             responseProxyCommand = asyncContext.getRequest().createHttpCommandResponse(
                 sendMessageBatchResponseHeader,
                 SendMessageBatchResponseBody.buildBody(ProxyResponseCode.PROXY_BATCH_SPEED_OVER_LIMIT_ERR.getRetCode(), ProxyResponseCode.PROXY_BATCH_SPEED_OVER_LIMIT_ERR.getErrMsg()));
@@ -150,11 +149,12 @@ public class SendBatchMessageProcessor implements HttpRequestProcessor {
 
             long batchEndTime = System.currentTimeMillis();
             if (batchMessageLogger.isDebugEnabled()) {
-                batchMessageLogger.debug("batchMessage|proxy2broker|REQ|{}|batchId={}|cost={}ms|msgNum={}|topic={}",
+                batchMessageLogger.debug("batchMessage|proxy2broker|{}|clientIp={}|pid={}|cost={}ms|msgNum={}|topic={}",
                     MessageType.ASYNC,
-                    sendMessageBatchRequestBody.getBatchId(),
+                    sendMessageBatchRequestHeader.getIp(),
+                    sendMessageBatchRequestHeader.getPid(),
                     batchEndTime - batchStartTime,
-                    sendMessageBatchRequestBody.getSize(),
+                    sendMessageBatchRequestBody.getContents().size(),
                     msgList.get(0).getTopic());
             }
 
