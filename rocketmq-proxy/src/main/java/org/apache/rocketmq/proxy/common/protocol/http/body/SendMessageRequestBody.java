@@ -11,7 +11,6 @@ public class SendMessageRequestBody extends Body {
     public static final String TOPIC = "topic";
     public static final String MESSAGETYPE = "messageType";
     public static final String BIZSEQNO = "bizSeqNo";
-    public static final String UNIQUEID = "uniqueId";
     public static final String CONTENT = "content";
     public static final String TTL = "ttl";
     public static final String EXTFIELDS = "extfields";
@@ -19,7 +18,6 @@ public class SendMessageRequestBody extends Body {
     private String topic;
     private String messageType;
     private String bizSeqNo;
-    private String uniqueId;
     private String ttl;
     private String content;
     private HashMap<String, String> extfields;
@@ -46,14 +44,6 @@ public class SendMessageRequestBody extends Body {
 
     public void setBizSeqNo(String bizSeqNo) {
         this.bizSeqNo = bizSeqNo;
-    }
-
-    public String getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
     }
 
     public String getContent() {
@@ -87,7 +77,6 @@ public class SendMessageRequestBody extends Body {
             ? String.valueOf(MessageType.ASYNC.getType()) : MapUtils.getString(bodyParam, MESSAGETYPE);
         body.setMessageType(messageType);
         body.setBizSeqNo(MapUtils.getString(bodyParam, BIZSEQNO));
-        body.setUniqueId(MapUtils.getString(bodyParam, UNIQUEID));
         body.setTtl(MapUtils.getString(bodyParam, TTL));
         body.setContent(MapUtils.getString(bodyParam, CONTENT));
         String extFields = MapUtils.getString(bodyParam, EXTFIELDS);
@@ -103,7 +92,6 @@ public class SendMessageRequestBody extends Body {
         map.put(TOPIC, topic);
         map.put(MESSAGETYPE, messageType);
         map.put(BIZSEQNO, bizSeqNo);
-        map.put(UNIQUEID, uniqueId);
         map.put(TTL, ttl);
         map.put(CONTENT, content);
         map.put(EXTFIELDS, extfields);
@@ -117,7 +105,6 @@ public class SendMessageRequestBody extends Body {
             .append("topic=").append(topic).append(",")
             .append("messageType=").append(messageType).append(",")
             .append("bizSeqNo=").append(bizSeqNo).append(",")
-            .append("uniqueId=").append(uniqueId).append(",")
             .append("content=").append(content).append(",")
             .append("ttl=").append(ttl).append(",")
             .append("extfields=").append(extfields).append("}");

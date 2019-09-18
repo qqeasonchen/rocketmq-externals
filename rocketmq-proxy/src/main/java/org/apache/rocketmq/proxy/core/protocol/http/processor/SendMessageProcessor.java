@@ -66,7 +66,6 @@ public class SendMessageProcessor implements HttpRequestProcessor {
         }
 
         if (StringUtils.isBlank(sendMessageRequestBody.getBizSeqNo())
-            || StringUtils.isBlank(sendMessageRequestBody.getUniqueId())
             || StringUtils.isBlank(sendMessageRequestBody.getTopic())
             || StringUtils.isBlank(sendMessageRequestBody.getContent())
             || (StringUtils.isBlank(sendMessageRequestBody.getTtl())
@@ -78,13 +77,12 @@ public class SendMessageProcessor implements HttpRequestProcessor {
             return;
         }
 
-        messageLogger.info("message|client2Proxy|{}|clientIp={}|pid={}|topic={}|bizSeqNo={}|uniqueId={}",
+        messageLogger.info("message|client2Proxy|{}|clientIp={}|pid={}|topic={}|bizSeqNo={}",
             MessageType.get(Integer.valueOf(sendMessageRequestBody.getMessageType())),
             sendMessageRequestHeader.getIp(),
             sendMessageRequestHeader.getPid(),
             sendMessageRequestBody.getTopic(),
-            sendMessageRequestBody.getBizSeqNo(),
-            sendMessageRequestBody.getUniqueId());
+            sendMessageRequestBody.getBizSeqNo());
 
         String producerGroup = sendMessageRequestHeader.getGroupName();
         ProxyProducer proxyProducer = mQProxyServer.getProducerManager().getProxyProducer(producerGroup);
@@ -185,13 +183,12 @@ public class SendMessageProcessor implements HttpRequestProcessor {
         }
 
         long endTime = System.currentTimeMillis();
-        messageLogger.info("message|proxy2broker|{}|clientIp={}|pid={}|cost={}ms|topic={}|bizSeqNo={}|uniqueId={}",
+        messageLogger.info("message|proxy2broker|{}|clientIp={}|pid={}|cost={}ms|topic={}|bizSeqNo={}",
             MessageType.get(Integer.valueOf(sendMessageRequestBody.getMessageType())),
             sendMessageRequestHeader.getIp(),
             sendMessageRequestHeader.getPid(),
             endTime - startTime,
             sendMessageRequestBody.getTopic(),
-            sendMessageRequestBody.getBizSeqNo(),
-            sendMessageRequestBody.getUniqueId());
+            sendMessageRequestBody.getBizSeqNo());
     }
 }
